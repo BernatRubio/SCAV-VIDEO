@@ -54,13 +54,25 @@ def serpentine(image_path):
 
     return zigzag_data
 
-def color_to_bw(image_path):
+def color_to_bw(image_path, crf):
+    """
+    Parameters:
+
+    image_path: Path of the input image.
+    crf: Constant Rate Factor. The lower it is, the higher the compression will be.
+    """
     base_name, ext = os.path.splitext(os.path.basename(image_path))
+    output_path = f"./output_images/{base_name}_bw_crf{crf}.jpg"
 
-    output_path = f"{base_name}_bw{ext}"
-
-    cmd = f'ffmpeg -i "{image_path}" -vf "format=gray" "./output_images/{output_path}"'
-    subprocess.run(cmd, shell=True)
+    cmd = f'ffmpeg -i "{image_path}" -vf "format=gray" -c:v libx264 -crf {crf} "{output_path}"'
+    
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        print(f"Conversion successful. Image saved as {output_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+        
+    return output_path
 
 def run_length_encoding(input):
 
@@ -94,16 +106,22 @@ if __name__ == "__main__":
     if ((function_name == "rgb_to_yuv" or function_name == "yuv_to_rgb") and len(sys.argv) != 5):
         print("Usage: python rgb_yuv.py function_name R|Y G|U B|V")
         sys.exit(1)
-    elif function_name == "ffmpeg_resize" and len(sys.argv) != 3:
+    if function_name == "ffmpeg_resize" and len(sys.argv) != 3:
         print("Usage: python rgb_yuv.py ffmpeg_resize 'path_to_im'")
 
     if function_name == "rgb_to_yuv" or function_name == "yuv_to_rgb":
         r = float(sys.argv[2])
         g = float(sys.argv[3])
         b = float(sys.argv[4])
-    elif function_name == "ffmpeg_resize" or function_name == "serpentine" or function_name == "color_to_bw" or function_name == "run_length_encoding" or "dct_encode" or "dct_decode":
+    if function_name == "ffmpeg_resize" or function_name == "serpentine" or function_name == "run_length_encoding" or "dct_encode" or "dct_decode":
         im_path = sys.argv[2]
         array_of_bytes = sys.argv[2]
+        
+    if function_name == "color_to_bw":
+        if len(sys.argv) != 4:
+            print("Usage: python rgb_yuv.py color_to_bw 'path_to_im' 'crf'")
+        im_path = sys.argv[2]
+        constRateFactor = float(sys.argv[3])
 
     if function_name == "rgb_to_yuv":
         result = rgb_to_yuv(r, g, b)
@@ -114,7 +132,7 @@ if __name__ == "__main__":
     elif function_name == "serpentine":
         result = serpentine(im_path)
     elif function_name == "color_to_bw":
-        result = color_to_bw(im_path)
+        result = color_to_bw(im_path,constRateFactor)
     elif function_name == "run_length_encoding":
         result = run_length_encoding(array_of_bytes)
     elif function_name == "dct_encode":
