@@ -20,7 +20,7 @@ def ffmpeg_resize(path_to_im):
     base_name, ext = os.path.splitext(os.path.basename(path_to_im))
     output_path = f"{base_name}_filtered{ext}"
 
-    cmd = f'ffmpeg -i "{path_to_im}" -vf "scale=360:-1" "./output_images/{output_path}"'
+    cmd = f'ffmpeg -i "{path_to_im}" -vf "scale=360:-1" "./{output_path}"'
     try:
         subprocess.run(cmd, shell=True, check=True)
         print(f"Resize successful. Image saved as {output_path}")
@@ -55,7 +55,7 @@ def serpentine(image_path):
 
 def color_to_bw(image_path, crf):
     base_name, ext = os.path.splitext(os.path.basename(image_path))
-    output_path = f"./output_images/{base_name}_bw_crf{crf}.jpg"
+    output_path = f"./{base_name}_bw_crf{crf}{ext}"
 
     cmd = f'ffmpeg -i "{image_path}" -vf "format=gray" -q:v {crf} "{output_path}"'
 
