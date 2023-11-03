@@ -27,3 +27,7 @@ class Macroblocks:
         subprocess.run(cmd4, shell=True, check=True)
         subprocess.run(cmd5, shell=True, check=True)
 
+    def showStreams(self,input_file):
+        cmd = f'ffprobe {input_file} -hide_banner -show_entries format=nb_streams -v 0 -of compact=p=0:nk=1'
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        print(f"The number of tracks of video {input_file} is {result.stdout}")
