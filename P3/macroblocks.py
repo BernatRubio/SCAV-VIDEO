@@ -43,4 +43,4 @@ class Macroblocks:
             f'-v 0 -of compact=p=0:nk=1'
         )
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        print(f"The number of tracks of video {input_file} is {result.stdout}")
+        print(f"The number of tracks of video {input_file} is {result.stdout.strip()}")
