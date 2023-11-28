@@ -1,15 +1,14 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QComboBox, QStatusBar, QDesktopWidget
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QComboBox, QStatusBar, QDesktopWidget, QLineEdit
+from PyQt5.QtGui import QIntValidator
 from rescompress import ResCompressor
-import time
 
 class MyApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Video Browser")
-        self.setFixedSize(450,200)
+        self.setFixedSize(450,280)
         self.center_on_screen()
 
         self.label = QLabel("Input File: ", self)
@@ -28,17 +27,26 @@ class MyApp(QMainWindow):
         self.combobox = QComboBox(self)
         self.combobox.addItems(["","Resize", "Change Codec"])
         self.combobox.setGeometry(120,100,300,30)
-        self.combobox.activated[str].connect(self.combobox_function)
         
         self.codecbox = QComboBox(self)
         self.codecbox.addItems(["","vp8", "vp9", "h265", "av1"])
         self.codecbox.setGeometry(120,150,300,30)
-        self.codecbox.activated[str].connect(self.codecbox_function)
-        
         
         self.status_bar = QStatusBar(self)
         self.setStatusBar(self.status_bar)
         self.status_bar.setStyleSheet("color: red;")
+        
+        self.execute_button = QPushButton("Execute", self)
+        self.execute_button.setGeometry(20, 200, 80, 30)
+        self.execute_button.clicked.connect(self.execute_function)
+        
+        self.resx = QLineEdit(self)
+        self.resx.setGeometry(20, 250, 80, 30)
+        self.resx.setValidator(QIntValidator(100, 7680, self))
+        
+        self.resy = QLineEdit(self)
+        self.resy.setGeometry(100, 250, 80, 30)
+        self.resy.setValidator(QIntValidator(100, 4320, self))
         
     def center_on_screen(self):
         # Get the screen geometry
@@ -55,26 +63,24 @@ class MyApp(QMainWindow):
 
         if file_path:
             self.label.setText(f"Input File: {file_path}")
-    
-    def combobox_function(self, item_text):
-        if (item_text == "Resize"):
-            obj = ResCompressor()
+            
+    def execute_function(self):
+        obj = ResCompressor()
+        if (self.combobox.currentText() == "Resize"):
             if((self.label.text()).split("Input File: ",1)[1]):
                 obj.resize((self.label.text()).split("Input File: ",1)[1],720, 480)
             else:
                 self.status_bar.showMessage("No file selected!", 3000)
-        elif (item_text == "Change Codec" and self.codecbox.currentText() != ""):
-            obj = ResCompressor()
+        elif (self.combobox.currentText() == "Change Codec" and self.codecbox.currentText() != "" and (self.label.text()).split("Input File: ",1)[1]):
             obj.changeCodec((self.label.text()).split("Input File: ",1)[1],self.codecbox.itemText(self.codecbox.currentIndex()))
+        elif (self.combobox.currentText() == ""):
+            self.status_bar.showMessage("No function selected!", 3000)
+        elif (self.combobox.currentText() == "Change Codec" and self.codecbox.currentText() == ""):
+            self.status_bar.showMessage("No codec selected!", 3000)
+        elif (self.combobox.currentText() == "Change Codec" and self.codecbox.currentText() != "" and (self.label.text()).split("Input File: ",1)[1] == ""):
+            self.status_bar.showMessage("No file selected!", 3000)
             
-    def codecbox_function(self):
-        if((self.label.text()).split("Input File: ",1)[1] and self.codecbox.currentText() != "" and self.combobox.currentText() == "Change Codec"):
-            obj = ResCompressor()
-            obj.changeCodec((self.label.text()).split("Input File: ",1)[1],self.codecbox.itemText(self.codecbox.currentIndex()))
-        elif self.codecbox.currentText() == "":
-            self.status_bar.showMessage("Select a valid codec!", 2000)
-        elif self.combobox.currentText() == "":
-            self.status_bar.showMessage("Select the 'Change Codec' function before selecting a codec!", 2000)
+            
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
