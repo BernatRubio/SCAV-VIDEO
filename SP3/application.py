@@ -15,10 +15,10 @@ class MyApp(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.setWindowTitle("Video Operations GUI")
-        self.setFixedSize(470, 170)
+        self.setFixedSize(500, 170)
         self.center_on_screen()
         oImage = QtGui.QImage(os.path.join(CURRENT_DIR, "bgimage.jpg"))
-        sImage = oImage.scaled(QtCore.QSize(470, 170))
+        sImage = oImage.scaled(QtCore.QSize(500, 170))
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Window, QtGui.QBrush(sImage))
         self.setPalette(palette)
@@ -28,7 +28,7 @@ class MyApp(QMainWindow):
         
         self.status_bar = QStatusBar(self)
         self.setStatusBar(self.status_bar)
-        self.status_bar.setStyleSheet("color: red;")
+        self.status_bar.setStyleSheet("color: white;")
         
         self.central_widget.browse_button.clicked.connect(self.browse_file)
         self.central_widget.execute_button.clicked.connect(self.execute_function)
@@ -56,7 +56,7 @@ class MyApp(QMainWindow):
             
     def execute_function(self):
         obj = ResCompressor()
-        if (self.central_widget.functionbox.currentText() == "Resize"):
+        if (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" or self.central_widget.resx.text() != ""):
             if(self.filepath):
                 obj.resize(self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()))
             else:
@@ -71,3 +71,5 @@ class MyApp(QMainWindow):
             self.status_bar.showMessage("No file selected!", 3000)
         elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and self.central_widget.codecbox1.currentText() != "" and self.central_widget.codecbox2.currentText() != "" and self.filepath):
             obj.compareCodecs(self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText())
+        elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() == "" or self.central_widget.resx.text() == ""):
+            self.status_bar.showMessage("Resx and Resy must be defined!", 3000)
