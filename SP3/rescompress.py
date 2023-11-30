@@ -10,7 +10,7 @@ class ResCompressor:
         base_name, ext = os.path.splitext(os.path.basename(input_file))
         output_path = f"{base_name}_{resx}_{resy}{ext}"
 
-        cmd = f'ffmpeg -hide_banner -i {input_file} -vf scale={resx}:{resy} ./{output_path}'
+        cmd = f'ffmpeg -hide_banner -i "{input_file}" -vf scale={resx}:{resy} "./{output_path}"'
         try:
             subprocess.run(cmd, shell=True, check=True)
             print(f"Resize successful. Image saved as {output_path}")
@@ -20,13 +20,13 @@ class ResCompressor:
     def changeCodec(self,input_file, codec):
         base_name, ext = os.path.splitext(os.path.basename(input_file))
         if codec.lower() == "vp8":
-            cmd = f"ffmpeg -i {input_file} -c:v libvpx -b:v 0 ./{base_name}_{codec}.webm"
+            cmd = f'ffmpeg -i "{input_file}" -c:v libvpx -b:v 0 ./{base_name}_{codec}.webm'
         elif codec.lower() == "vp9":
-            cmd = f"ffmpeg -i {input_file} -c:v libvpx-vp9 -b:v 0 ./{base_name}_{codec}.webm"
+            cmd = f'ffmpeg -i "{input_file}" -c:v libvpx-vp9 -b:v 0 ./{base_name}_{codec}.webm'
         elif codec.lower() == "h265":
-            cmd = f"ffmpeg -i {input_file} -c:v libx265 -b:v 0 ./{base_name}_{codec}.mp4"
+            cmd = f'ffmpeg -i "{input_file}" -c:v libx265 -b:v 0 ./{base_name}_{codec}.mp4'
         elif codec.lower() == "av1":
-            cmd = f"ffmpeg -i {input_file} -c:v libaom-av1 -b:v 0 {base_name}_{codec}.mkv"
+            cmd = f'ffmpeg -i "{input_file}" -c:v libaom-av1 -b:v 0 {base_name}_{codec}.mkv'
             
         subprocess.run(cmd, shell=True, check=True)
         
@@ -48,7 +48,8 @@ class ResCompressor:
             codec2new = "mkv"
         cmd = (
             
-            f"ffmpeg -i {base_name}_{codec1.lower()}.{codec1new} -i {base_name}_{codec2.lower()}.{codec2new} -filter_complex [0:v][1:v]hstack -c:v libx264 -crf 23 -c:a aac -b:a 192k ./comparison_output.mp4"
+            f'ffmpeg -i "{base_name}_{codec1.lower()}.{codec1new}" -i "{base_name}_{codec2.lower()}.{codec2new}"' 
+            ' -filter_complex [0:v][1:v]hstack -c:v libx264 -crf 23 -c:a aac -b:a 192k ./comparison_output.mp4'
         
         )
         
