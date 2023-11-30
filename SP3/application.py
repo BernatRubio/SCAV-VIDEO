@@ -1,12 +1,9 @@
-import os
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStatusBar, QDesktopWidget
-from PyQt5.QtCore import QDir, QThreadPool
+from PyQt5.QtCore import QDir, QThreadPool, QTimer
 from PyQt5 import QtGui, QtCore
 from rescompress import ResCompressor
 from widget import Window
 from worker import Worker
-
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class MyApp(QMainWindow):
     def __init__(self):
@@ -39,7 +36,12 @@ class MyApp(QMainWindow):
         self.outfilepath = ""
         
         self.threadpool = QThreadPool()
-
+        self.threadpool.setMaxThreadCount(1)
+        
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.check_threadpool)
+        self.timer.start(1000)
+    
     
     def center_on_screen(self):
         screen_geometry = QDesktopWidget().screenGeometry()
@@ -72,6 +74,13 @@ class MyApp(QMainWindow):
         if outfilepath:
             self.outfilepath = outfilepath
             self.central_widget.label_path_output.setText(f"{outfilepath}")
+            
+    def check_threadpool(self):
+        # Update the status bar based on the number of active threads
+        if self.threadpool.activeThreadCount() > 0:
+            self.status_bar.showMessage(f"Executing...", 1000)
+        else:
+            self.status_bar.clearMessage()
                    
     def execute_function(self):
         obj = ResCompressor()
