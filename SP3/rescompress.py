@@ -31,8 +31,8 @@ class ResCompressor:
         subprocess.run(cmd, shell=True, check=True)
         
     def compareCodecs(self,input_file,codec1, codec2, output_dir):
-        self.changeCodec(input_file,codec1)
-        self.changeCodec(input_file,codec2)
+        self.changeCodec(input_file,codec1, output_dir)
+        self.changeCodec(input_file,codec2, output_dir)
         base_name, ext = os.path.splitext(os.path.basename(input_file))
         if codec1 == "vp8" or codec1 == "vp9":
             codec1new = "webm"
@@ -48,8 +48,8 @@ class ResCompressor:
             codec2new = "mkv"
         cmd = (
             
-            f'ffmpeg -i "{base_name}_{codec1.lower()}.{codec1new}" -i "{base_name}_{codec2.lower()}.{codec2new}"' 
-            f' -filter_complex [0:v][1:v]hstack -c:v libx264 -crf 23 -c:a aac -b:a 192k {output_dir}/comparison_output.mp4'
+            f'ffmpeg -i "{output_dir}/{base_name}_{codec1.lower()}.{codec1new}" -i "{output_dir}/{base_name}_{codec2.lower()}.{codec2new}"' 
+            f' -filter_complex [0:v][1:v]hstack -c:v libx264 -crf 23 -c:a aac -b:a 192k "{output_dir}/comparison_output.mp4"'
         
         )
         

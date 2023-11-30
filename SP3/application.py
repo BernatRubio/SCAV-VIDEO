@@ -1,9 +1,10 @@
 import os
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStatusBar, QDesktopWidget
-from PyQt5.QtCore import QDir
+from PyQt5.QtCore import QDir, QThreadPool
 from PyQt5 import QtGui, QtCore
 from rescompress import ResCompressor
 from widget import Window
+from worker import Worker
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -17,11 +18,11 @@ class MyApp(QMainWindow):
         self.setWindowTitle("Video Operations GUI")
         self.setFixedSize(500, 180)
         self.center_on_screen()
-        oImage = QtGui.QImage(os.path.join(CURRENT_DIR, "bgimage.jpg"))
-        sImage = oImage.scaled(QtCore.QSize(500, 180))
-        palette = QtGui.QPalette()
-        palette.setBrush(QtGui.QPalette.Window, QtGui.QBrush(sImage))
-        self.setPalette(palette)
+
+        self.movie = QtGui.QMovie("wallpaper.webp")
+        self.movie.setScaledSize(QtCore.QSize(500, 180))
+        self.movie.frameChanged.connect(self.repaint)
+        self.movie.start()
         
         icon = QtGui.QIcon("./icon.png")
         self.setWindowIcon(icon)
@@ -36,6 +37,8 @@ class MyApp(QMainWindow):
         
         self.filepath = ""
         self.outfilepath = ""
+        
+        self.threadpool = QThreadPool()
 
     
     def center_on_screen(self):
@@ -45,6 +48,14 @@ class MyApp(QMainWindow):
         center_y = screen_geometry.height() // 2 - self.height() // 2
         
         self.move(center_x, center_y)
+    
+    def paintEvent(self, event):
+        currentFrame = self.movie.currentPixmap()
+        frameRect = currentFrame.rect()
+        frameRect.moveCenter(self.rect().center())
+        if frameRect.intersects(event.rect()):
+            painter = QtGui.QPainter(self)
+            painter.drawPixmap(frameRect.left(), frameRect.top(), currentFrame)
     
     def browse_file(self):
         file_dialog = QFileDialog(self,directory=QDir.homePath())
@@ -61,32 +72,36 @@ class MyApp(QMainWindow):
         if outfilepath:
             self.outfilepath = outfilepath
             self.central_widget.label_path_output.setText(f"{outfilepath}")
-            
+                   
     def execute_function(self):
         obj = ResCompressor()
+        
         if (self.filepath == ""):
             self.status_bar.showMessage("No file selected!", 3000)
         
         elif (self.outfilepath == ""):
-            self.status_bar.showMessage("No directory selected!", 3000)
+            self.status_bar.showMessage("Select output directory!", 3000)
         
         elif (self.central_widget.functionbox.currentText() == ""):
             self.status_bar.showMessage("No function selected!", 3000)
         
         elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" and self.central_widget.resy.text() != ""):
-            obj.resize(self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()),self.outfilepath)
+            worker = Worker(obj.resize, self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()),self.outfilepath)
+            self.threadpool.start(worker)
         
         elif (self.central_widget.functionbox.currentText() == "Resize" and (self.central_widget.resx.text() == "" or self.central_widget.resy.text() == "")):
             self.status_bar.showMessage("Resx and Resy must be defined!", 3000)
 
         elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() != ""):
-            obj.changeCodec(self.filepath,self.central_widget.codecbox.itemText(self.central_widget.codecbox.currentIndex()),self.outfilepath)
+            worker2 = Worker(obj.changeCodec, self.filepath,self.central_widget.codecbox.itemText(self.central_widget.codecbox.currentIndex()),self.outfilepath)
+            self.threadpool.start(worker2)
         
         elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() == ""):
             self.status_bar.showMessage("No codec selected!", 3000)
         
         elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and self.central_widget.codecbox1.currentText() != "" and self.central_widget.codecbox2.currentText() != ""):
-            obj.compareCodecs(self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText(),self.outfilepath)
+            worker3 = Worker(obj.compareCodecs, self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText(),self.outfilepath)
+            self.threadpool.start(worker3)
         
         elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and (self.central_widget.codecbox1.currentText() == "" or self.central_widget.codecbox2.currentText() == "")):
             self.status_bar.showMessage("Codec 1 and Codec 2 must be chosen!", 3000)
