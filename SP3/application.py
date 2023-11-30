@@ -56,7 +56,9 @@ class MyApp(QMainWindow):
             
     def execute_function(self):
         obj = ResCompressor()
-        if (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" or self.central_widget.resx.text() != ""):
+        if (self.filepath == ""):
+            self.status_bar.showMessage("No file selected!", 3000)
+        elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" or self.central_widget.resx.text() != ""):
             if(self.filepath):
                 obj.resize(self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()))
             else:
@@ -71,5 +73,7 @@ class MyApp(QMainWindow):
             self.status_bar.showMessage("No file selected!", 3000)
         elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and self.central_widget.codecbox1.currentText() != "" and self.central_widget.codecbox2.currentText() != "" and self.filepath):
             obj.compareCodecs(self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText())
-        elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() == "" or self.central_widget.resx.text() == ""):
+        elif (self.central_widget.functionbox.currentText() == "Resize" and (self.central_widget.resx.text() == "" or self.central_widget.resx.text() == "")):
             self.status_bar.showMessage("Resx and Resy must be defined!", 3000)
+        elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and (self.central_widget.codecbox1.currentText() == "" or self.central_widget.codecbox2.currentText() == "")):
+            self.status_bar.showMessage("Codec 1 and Codec 2 must be chosen!", 3000)
