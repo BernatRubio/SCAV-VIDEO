@@ -13,11 +13,13 @@ class MyApp(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.setWindowTitle("Video Operations GUI")
-        self.setFixedSize(500, 180)
+        self.screen_geometry = QDesktopWidget().screenGeometry()
+        self.setFixedSize(self.screen_geometry.width() // 4, self.screen_geometry.height() // 6)
         self.center_on_screen()
 
         self.movie = QtGui.QMovie("wallpaper.webp")
-        self.movie.setScaledSize(QtCore.QSize(500, 180))
+        #self.movie.setScaledSize(QtCore.QSize(500, 180))
+        self.movie.setScaledSize(QtCore.QSize(self.screen_geometry.width() // 4, self.screen_geometry.height() // 6))
         self.movie.frameChanged.connect(self.repaint)
         self.movie.start()
         
@@ -43,10 +45,9 @@ class MyApp(QMainWindow):
     
     
     def center_on_screen(self):
-        screen_geometry = QDesktopWidget().screenGeometry()
         
-        center_x = screen_geometry.width() // 2 - self.width() // 2
-        center_y = screen_geometry.height() // 2 - self.height() // 2
+        center_x = self.screen_geometry.width() // 2 - self.width() // 2
+        center_y = self.screen_geometry.height() // 2 - self.height() // 2
         
         self.move(center_x, center_y)
     
