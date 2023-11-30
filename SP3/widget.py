@@ -19,15 +19,19 @@ class Window(QWidget):
         # Add widgets to the layout
         self.label_input = QLabel("Input File: ")
         layout.addWidget(self.label_input,0,0)
+        self.label_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         self.label_output = QLabel("Output Folder: ")
         layout.addWidget(self.label_output,1,0)
+        self.label_output.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         self.label_path = QLabel()
         layout.addWidget(self.label_path,0,1)
+        self.label_path.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         self.label_path_output = QLabel()
         layout.addWidget(self.label_path_output,1,1)
+        self.label_path_output.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         self.browse_button = QPushButton("Browse File")
         layout.addWidget(self.browse_button,2,0)
