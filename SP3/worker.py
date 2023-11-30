@@ -31,14 +31,9 @@ class Worker(QRunnable):
         Initialise the runner function with passed args, kwargs.
         '''
         try:
-            # Before running the function, emit a signal to update the status bar
-            self.signals.update_status.emit("Executing...")
-
             # Run the specified function
             self.fn(*self.args, **self.kwargs)
 
-            # After completion, emit a signal to update the status bar
-            self.signals.update_status.emit("Execution completed successfully!")
         except Exception as e:
             # If an exception occurs, emit a signal with the error message
             self.signals.update_status.emit(f"Error: {str(e)}")
