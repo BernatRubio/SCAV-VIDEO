@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import (
-    QApplication,
     QGridLayout,
     QPushButton,
     QWidget,
@@ -8,7 +7,9 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QSizePolicy
 )
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtCore import QRegExp
+
 
 class Window(QWidget):
     def __init__(self):
@@ -48,12 +49,14 @@ class Window(QWidget):
         layout.addWidget(self.functionbox,3,1)
 
         self.resx = QLineEdit()
-        self.resx.setValidator(QIntValidator(100, 7680, self))
+        self.resx.setPlaceholderText("Example: 720")
+        self.resx.setValidator(QRegExpValidator(QRegExp("[0-9]{1,4}")))
         self.resx.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
         
         self.resy = QLineEdit()
-        self.resy.setValidator(QIntValidator(100, 4320, self))
+        self.resy.setPlaceholderText("Example: 480")
+        self.resy.setValidator(QRegExpValidator(QRegExp("[0-9]{1,4}")))
         self.resy.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
          
         self.execute_button = QPushButton("Execute", self)
