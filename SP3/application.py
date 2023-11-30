@@ -17,12 +17,12 @@ class MyApp(QMainWindow):
         self.setFixedSize(self.screen_geometry.width() // 3, self.screen_geometry.height() // 3)
         self.center_on_screen()
 
-        self.movie = QtGui.QMovie("wallpaper.webp")
+        self.movie = QtGui.QMovie("./assets/wallpaper.webp")
         self.movie.setScaledSize(QtCore.QSize(self.screen_geometry.width() // 3, self.screen_geometry.height() // 3))
         self.movie.frameChanged.connect(self.repaint)
         self.movie.start()
         
-        icon = QtGui.QIcon("./icon.png")
+        icon = QtGui.QIcon("./assets/icon.png")
         self.setWindowIcon(icon)
         
         self.status_bar = QStatusBar(self)
