@@ -36,7 +36,6 @@ class MyApp(QMainWindow):
         self.outfilepath = ""
         
         self.threadpool = QThreadPool()
-        self.threadpool.setMaxThreadCount(1)
         
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.check_threadpool)
