@@ -14,12 +14,11 @@ class MyApp(QMainWindow):
 
         self.setWindowTitle("Video Operations GUI")
         self.screen_geometry = QDesktopWidget().screenGeometry()
-        self.setFixedSize(self.screen_geometry.width() // 4, self.screen_geometry.height() // 6)
+        self.setFixedSize(self.screen_geometry.width() // 3, self.screen_geometry.height() // 5)
         self.center_on_screen()
 
         self.movie = QtGui.QMovie("wallpaper.webp")
-        #self.movie.setScaledSize(QtCore.QSize(500, 180))
-        self.movie.setScaledSize(QtCore.QSize(self.screen_geometry.width() // 4, self.screen_geometry.height() // 6))
+        self.movie.setScaledSize(QtCore.QSize(self.screen_geometry.width() // 3, self.screen_geometry.height() // 5))
         self.movie.frameChanged.connect(self.repaint)
         self.movie.start()
         
