@@ -78,8 +78,6 @@ class MyApp(QMainWindow):
         # Update the status bar based on the number of active threads
         if self.threadpool.activeThreadCount() > 0:
             self.status_bar.showMessage(f"Executing...", 1000)
-        else:
-            self.status_bar.clearMessage()
                    
     def execute_function(self):
         obj = ResCompressor()
