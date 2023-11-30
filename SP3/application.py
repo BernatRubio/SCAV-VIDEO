@@ -15,10 +15,10 @@ class MyApp(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.setWindowTitle("Video Operations GUI")
-        self.setFixedSize(500, 170)
+        self.setFixedSize(500, 180)
         self.center_on_screen()
         oImage = QtGui.QImage(os.path.join(CURRENT_DIR, "bgimage.jpg"))
-        sImage = oImage.scaled(QtCore.QSize(500, 170))
+        sImage = oImage.scaled(QtCore.QSize(500, 180))
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Window, QtGui.QBrush(sImage))
         self.setPalette(palette)
@@ -31,9 +31,11 @@ class MyApp(QMainWindow):
         self.status_bar.setStyleSheet("color: white;")
         
         self.central_widget.browse_button.clicked.connect(self.browse_file)
+        self.central_widget.browse_folder_button.clicked.connect(self.browse_folder)
         self.central_widget.execute_button.clicked.connect(self.execute_function)
         
         self.filepath = ""
+        self.outfilepath = ""
 
     
     def center_on_screen(self):
@@ -53,27 +55,39 @@ class MyApp(QMainWindow):
             self.filepath = file_path
             file_path = file_path.split('/')[-1]
             self.central_widget.label_path.setText(f"{file_path}")
+    
+    def browse_folder(self):
+        outfilepath = QFileDialog.getExistingDirectory(self, "Select Directory", QDir.homePath())
+
+        if outfilepath:
+            self.outfilepath = outfilepath
+            self.central_widget.label_path_output.setText(f"{outfilepath}")
             
     def execute_function(self):
         obj = ResCompressor()
         if (self.filepath == ""):
             self.status_bar.showMessage("No file selected!", 3000)
-        elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" or self.central_widget.resx.text() != ""):
-            if(self.filepath):
-                obj.resize(self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()))
-            else:
-                self.status_bar.showMessage("No file selected!", 3000)
-        elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() != "" and self.filepath):
-            obj.changeCodec(self.filepath,self.central_widget.codecbox.itemText(self.central_widget.codecbox.currentIndex()))
+        
+        elif (self.outfilepath == ""):
+            self.status_bar.showMessage("No directory selected!", 3000)
+        
         elif (self.central_widget.functionbox.currentText() == ""):
             self.status_bar.showMessage("No function selected!", 3000)
+        
+        elif (self.central_widget.functionbox.currentText() == "Resize" and self.central_widget.resx.text() != "" and self.central_widget.resy.text() != ""):
+            obj.resize(self.filepath,int(self.central_widget.resx.text()), int(self.central_widget.resy.text()),self.outfilepath)
+        
+        elif (self.central_widget.functionbox.currentText() == "Resize" and (self.central_widget.resx.text() == "" or self.central_widget.resy.text() == "")):
+            self.status_bar.showMessage("Resx and Resy must be defined!", 3000)
+
+        elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() != ""):
+            obj.changeCodec(self.filepath,self.central_widget.codecbox.itemText(self.central_widget.codecbox.currentIndex()),self.outfilepath)
+        
         elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() == ""):
             self.status_bar.showMessage("No codec selected!", 3000)
-        elif (self.central_widget.functionbox.currentText() == "Change Codec" and self.central_widget.codecbox.currentText() != "" and self.filepath == ""):
-            self.status_bar.showMessage("No file selected!", 3000)
-        elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and self.central_widget.codecbox1.currentText() != "" and self.central_widget.codecbox2.currentText() != "" and self.filepath):
-            obj.compareCodecs(self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText())
-        elif (self.central_widget.functionbox.currentText() == "Resize" and (self.central_widget.resx.text() == "" or self.central_widget.resx.text() == "")):
-            self.status_bar.showMessage("Resx and Resy must be defined!", 3000)
+        
+        elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and self.central_widget.codecbox1.currentText() != "" and self.central_widget.codecbox2.currentText() != ""):
+            obj.compareCodecs(self.filepath,self.central_widget.codecbox1.currentText(),self.central_widget.codecbox2.currentText(),self.outfilepath)
+        
         elif (self.central_widget.functionbox.currentText() == "Compare Codecs" and (self.central_widget.codecbox1.currentText() == "" or self.central_widget.codecbox2.currentText() == "")):
             self.status_bar.showMessage("Codec 1 and Codec 2 must be chosen!", 3000)
