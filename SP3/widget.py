@@ -67,7 +67,6 @@ class Window(QWidget):
         self.setLayout(layout)
         
         def on_functionbox_change(text):
-            # Clear the layout and add self.resx and self.resy if needed
             for i in reversed(range(layout.count())): 
                 layout.itemAt(i).widget().setParent(None)
             layout.addWidget(self.label_input,0,0)

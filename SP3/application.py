@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QLabel, QStatusBar, QDesktopWidget
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStatusBar, QDesktopWidget
 from PyQt5.QtCore import QDir
 from PyQt5 import QtGui, QtCore
 from rescompress import ResCompressor
@@ -23,7 +23,7 @@ class MyApp(QMainWindow):
         palette.setBrush(QtGui.QPalette.Window, QtGui.QBrush(sImage))
         self.setPalette(palette)
         
-        icon = QtGui.QIcon("./icon.png")  # Replace with the actual path to your icon
+        icon = QtGui.QIcon("./icon.png")
         self.setWindowIcon(icon)
         
         self.status_bar = QStatusBar(self)
@@ -39,7 +39,6 @@ class MyApp(QMainWindow):
 
     
     def center_on_screen(self):
-        # Get the screen geometry
         screen_geometry = QDesktopWidget().screenGeometry()
         
         center_x = screen_geometry.width() // 2 - self.width() // 2
